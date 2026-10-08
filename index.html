@@ -371,10 +371,28 @@
         <span id="toastMessage">Ação realizada com sucesso!</span>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "COLOQUE_SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "000000000000",
+            appId: "1:000000000000:web:xxxxxxxxxxxxxxxxxx"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
         let currentImageBase64 = null;
         let regAvatarBase64 = null;
         let posts = [];
+        let currentUserEmail = null;
 
         window.onload = function() {
             initClock();
@@ -385,6 +403,7 @@
         function checkSession() {
             const currentUser = localStorage.getItem('thinknow_current_user');
             if (currentUser) {
+                currentUserEmail = currentUser;
                 document.getElementById('authContainer').classList.add('hidden');
                 loadUserData();
                 loadPosts();
@@ -424,81 +443,114 @@
             reader.readAsDataURL(file);
         }
 
-        function handleRegister(event) {
+        async function handleRegister(event) {
             event.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const dob = document.getElementById('regDob').value;
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
 
-            const userData = {
-                name: name,
-                email: email,
-                dob: dob,
-                password: password,
-                avatar: regAvatarBase64 || ''
-            };
+            if (!name || !dob || !email || !password) {
+                showToast('Preencha todos os campos.', 'error');
+                return;
+            }
 
-            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
-            localStorage.setItem('thinknow_current_user', email);
+            try {
+                const userDoc = await db.collection('users').doc(email).get();
+                if (userDoc.exists) {
+                    showToast('Este e-mail já está cadastrado.', 'error');
+                    return;
+                }
 
-            showToast('Conta criada com sucesso!');
-            setTimeout(() => { checkSession(); }, 500);
+                const userData = {
+                    name,
+                    email,
+                    dob,
+                    password,
+                    avatar: regAvatarBase64 || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('users').doc(email).set(userData);
+                localStorage.setItem('thinknow_current_user', email);
+                currentUserEmail = email;
+                showToast('Conta criada com sucesso!');
+                setTimeout(() => { checkSession(); }, 500);
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao criar conta no banco.', 'error');
+            }
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
 
-            const savedUserJson = localStorage.getItem('thinknow_user_' + email);
-            if (!savedUserJson) {
-                showToast('E-mail não encontrado. Crie uma conta.', 'error');
-                return;
-            }
+            try {
+                const userDoc = await db.collection('users').doc(email).get();
+                if (!userDoc.exists) {
+                    showToast('E-mail não encontrado. Crie uma conta.', 'error');
+                    return;
+                }
 
-            const userData = JSON.parse(savedUserJson);
-            if (userData.password !== password) {
-                showToast('Senha incorreta.', 'error');
-                return;
-            }
+                const userData = userDoc.data();
+                if (userData.password !== password) {
+                    showToast('Senha incorreta.', 'error');
+                    return;
+                }
 
-            localStorage.setItem('thinknow_current_user', email);
-            showToast('Login realizado com sucesso!');
-            setTimeout(() => { checkSession(); }, 500);
+                localStorage.setItem('thinknow_current_user', email);
+                currentUserEmail = email;
+                showToast('Login realizado com sucesso!');
+                setTimeout(() => { checkSession(); }, 500);
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao fazer login.', 'error');
+            }
         }
 
         function handleLogout() {
             localStorage.removeItem('thinknow_current_user');
+            currentUserEmail = null;
             showToast('Você saiu da conta.');
             setTimeout(() => { window.location.reload(); }, 500);
         }
 
-        function loadUserData() {
+        async function loadUserData() {
             const email = localStorage.getItem('thinknow_current_user');
             if (!email) return;
-            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
 
-            document.getElementById('usernameInput').value = userData.name || 'Usuário';
-            
-            const headerAvatar = document.getElementById('headerAvatarContainer');
-            if (userData.avatar) {
-                headerAvatar.innerHTML = `<img src="${userData.avatar}" class="w-full h-full object-cover">`;
-            } else {
-                headerAvatar.innerText = (userData.name || 'U').substring(0, 2).toUpperCase();
+            try {
+                const userDoc = await db.collection('users').doc(email).get();
+                if (!userDoc.exists) return;
+
+                const userData = userDoc.data();
+                document.getElementById('usernameInput').value = userData.name || 'Usuário';
+                
+                const headerAvatar = document.getElementById('headerAvatarContainer');
+                if (userData.avatar) {
+                    headerAvatar.innerHTML = `<img src="${userData.avatar}" class="w-full h-full object-cover">`;
+                } else {
+                    headerAvatar.innerText = (userData.name || 'U').substring(0, 2).toUpperCase();
+                }
+            } catch (error) {
+                console.error(error);
             }
         }
 
         function openProfileModal() {
             const email = localStorage.getItem('thinknow_current_user');
-            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
-
-            document.getElementById('profileName').value = userData.name || '';
-            document.getElementById('profileEmail').value = userData.email || '';
-            document.getElementById('profileDob').value = userData.dob || '';
-            document.getElementById('modalAvatarImg').src = userData.avatar || 'https://via.placeholder.com/150';
-
-            document.getElementById('profileModal').classList.remove('hidden');
+            if (!email) return;
+            db.collection('users').doc(email).get().then(doc => {
+                if (!doc.exists) return;
+                const userData = doc.data();
+                document.getElementById('profileName').value = userData.name || '';
+                document.getElementById('profileEmail').value = userData.email || '';
+                document.getElementById('profileDob').value = userData.dob || '';
+                document.getElementById('modalAvatarImg').src = userData.avatar || 'https://via.placeholder.com/150';
+                document.getElementById('profileModal').classList.remove('hidden');
+            });
         }
 
         function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
@@ -513,26 +565,35 @@
             reader.readAsDataURL(file);
         }
 
-        function saveProfileData() {
+        async function saveProfileData() {
             const email = localStorage.getItem('thinknow_current_user');
-            let userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+            if (!email) return;
 
-            userData.name = document.getElementById('profileName').value.trim();
-            userData.dob = document.getElementById('profileDob').value;
-            userData.avatar = document.getElementById('modalAvatarImg').src;
-
-            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
-            closeProfileModal();
-            loadUserData();
-            showToast('Perfil atualizado!');
+            try {
+                await db.collection('users').doc(email).update({
+                    name: document.getElementById('profileName').value.trim(),
+                    dob: document.getElementById('profileDob').value,
+                    avatar: document.getElementById('modalAvatarImg').src
+                });
+                closeProfileModal();
+                loadUserData();
+                showToast('Perfil atualizado!');
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao salvar perfil.', 'error');
+            }
         }
 
-        function saveUsername(name) {
+        async function saveUsername(name) {
             const email = localStorage.getItem('thinknow_current_user');
-            let userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
-            userData.name = name.trim();
-            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
-            showToast('Nome atualizado!');
+            if (!email) return;
+            try {
+                await db.collection('users').doc(email).update({ name: name.trim() });
+                showToast('Nome atualizado!');
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao atualizar nome.', 'error');
+            }
         }
 
         function initClock() {
@@ -597,49 +658,88 @@
             document.getElementById('charCount').innerText = `${input.value.length}/60`;
         }
 
-        function publishPost() {
+        async function publishPost() {
             if (!currentImageBase64) {
                 showToast('Selecione uma foto primeiro.', 'error');
                 return;
             }
+
             const email = localStorage.getItem('thinknow_current_user');
-            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
-            const username = userData.name || 'Usuário';
-            const summary = document.getElementById('postSummary').value.trim();
-            const now = new Date();
-            const timeString = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            if (!email) {
+                showToast('Faça login para publicar.', 'error');
+                return;
+            }
 
-            const newPost = {
-                id: 'post_' + Date.now(),
-                username: username,
-                image: currentImageBase64,
-                summary: summary || 'Momento THINKNOW.',
-                timestamp: timeString
-            };
+            try {
+                const userDoc = await db.collection('users').doc(email).get();
+                const userData = userDoc.data() || {};
+                const username = userData.name || 'Usuário';
+                const summary = document.getElementById('postSummary').value.trim();
+                const now = new Date();
+                const timestampText = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-            posts.unshift(newPost);
-            localStorage.setItem('thinknow_posts_' + email, JSON.stringify(posts));
+                const fileName = `posts/${Date.now()}-${email}.jpg`;
+                const storageRef = storage.ref(fileName);
+                const imageBlob = await fetch(currentImageBase64).then(res => res.blob());
+                await storageRef.put(imageBlob);
+                const photoUrl = await storageRef.getDownloadURL();
 
-            clearImagePreview();
-            renderPosts();
-            showToast('Momento postado com sucesso!');
+                const newPost = {
+                    userEmail: email,
+                    username,
+                    image: photoUrl,
+                    summary: summary || 'Momento THINKNOW.',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timestampText
+                };
+
+                await db.collection('posts').add(newPost);
+                clearImagePreview();
+                loadPosts();
+                showToast('Momento postado com sucesso!');
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao publicar post.', 'error');
+            }
         }
 
         function loadPosts() {
             const email = localStorage.getItem('thinknow_current_user');
-            const savedPosts = localStorage.getItem('thinknow_posts_' + email);
-            if (savedPosts) {
-                try { posts = JSON.parse(savedPosts); } catch (e) { posts = []; }
+            if (!email) {
+                posts = [];
+                renderPosts();
+                return;
             }
-            renderPosts();
+
+            db.collection('posts')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    posts = [];
+                    snapshot.docs.forEach((doc) => {
+                        const post = doc.data();
+                        posts.push({
+                            id: doc.id,
+                            username: post.username || 'Usuário',
+                            image: post.image || '',
+                            summary: post.summary || '',
+                            timestamp: post.timestampText || 'Agora'
+                        });
+                    });
+                    renderPosts();
+                }, (error) => {
+                    console.error(error);
+                    showToast('Erro ao carregar posts.', 'error');
+                });
         }
 
-        function deletePost(postId) {
-            const email = localStorage.getItem('thinknow_current_user');
-            posts = posts.filter(p => p.id !== postId);
-            localStorage.setItem('thinknow_posts_' + email, JSON.stringify(posts));
-            renderPosts();
-            showToast('Post removido.');
+        async function deletePost(postId) {
+            try {
+                await db.collection('posts').doc(postId).delete();
+                showToast('Post removido.');
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao remover post.', 'error');
+            }
         }
 
         function renderPosts() {
@@ -718,7 +818,7 @@
         }
 
         function escapeHtml(str) {
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
     </script>
 </body>
