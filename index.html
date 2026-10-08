@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="description" content="ThinkNow - um app web para organizar ideias, tarefas e foco." />
+    <title>ThinkNow</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon-192.svg" />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-2: #1f2937;
+        --primary: #8b5cf6;
+        --primary-2: #22c55e;
+        --text: #e5e7eb;
+        --muted: #a1a1aa;
+        --accent: #f59e0b;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 40%, #020617 100%);
+        color: var(--text);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .app {
+        width: min(92vw, 760px);
+        background: rgba(17, 24, 39, 0.88);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 24px 80px rgba(2, 6, 23, 0.7);
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary), #38bdf8);
+        display: grid;
+        place-items: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+      }
+
+      .tag {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+        gap: 16px;
+        margin: 24px 0;
+      }
+
+      .stat {
+        background: rgba(31, 41, 55, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 18px;
+        padding: 18px 16px;
+      }
+
+      .label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .value {
+        display: block;
+        margin-top: 8px;
+        font-size: clamp(1.5rem, 2vw, 2rem);
+        font-weight: 700;
+      }
+
+      .card {
+        background: rgba(17, 24, 39, 0.86);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .task-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .task-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(31, 41, 55, 0.8);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: var(--primary-2);
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
+      }
+
+      .task-text {
+        color: var(--text);
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 700;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(135deg, var(--primary), #3b82f6);
+      }
+
+      button.secondary {
+        background: linear-gradient(135deg, #1f2937, #374151);
+      }
+
+      @media (max-width: 520px) {
+        .top {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="top">
+        <div class="brand">
+          <div class="logo">T</div>
+          <div>
+            <h1>ThinkNow</h1>
+            <div class="tag">Organize sua rotina e foco.</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="Estatísticas do app">
+        <div class="stat">
+          <span class="label">Hoje</span>
+          <span class="value">04</span>
+        </div>
+        <div class="stat">
+          <span class="label">Meta</span>
+          <span class="value">80%</span>
+        </div>
+        <div class="stat">
+          <span class="label">Foco</span>
+          <span class="value">2h</span>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Lista de tarefas">
+        <ul class="task-list">
+          <li class="task-item"><span class="dot"></span><span class="task-text">Revisar proposta do cliente</span></li>
+          <li class="task-item"><span class="dot"></span><span class="task-text">Planejar tarefas da semana</span></li>
+          <li class="task-item"><span class="dot"></span><span class="task-text">Concluir sprint de produtividade</span></li>
+        </ul>
+      </section>
+
+      <div class="actions">
+        <button type="button">Adicionar tarefa</button>
+        <button type="button" class="secondary">Ver resumo</button>
+      </div>
+    </main>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {
+            console.warn('Service worker não disponível neste ambiente.');
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
