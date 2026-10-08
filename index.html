@@ -1,229 +1,725 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f172a" />
-    <meta name="description" content="ThinkNow - um app web para organizar ideias, tarefas e foco." />
-    <title>ThinkNow</title>
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="./icons/icon-192.svg" />
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>THINKNOW</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="THINKNOW">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      :root {
-        --bg: #0f172a;
-        --panel: #111827;
-        --panel-2: #1f2937;
-        --primary: #8b5cf6;
-        --primary-2: #22c55e;
-        --text: #e5e7eb;
-        --muted: #a1a1aa;
-        --accent: #f59e0b;
-      }
-
-      * { box-sizing: border-box; }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 40%, #020617 100%);
-        color: var(--text);
-        font-family: Arial, Helvetica, sans-serif;
-      }
-
-      .app {
-        width: min(92vw, 760px);
-        background: rgba(17, 24, 39, 0.88);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 24px 80px rgba(2, 6, 23, 0.7);
-      }
-
-      .top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
-
-      .logo {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, var(--primary), #38bdf8);
-        display: grid;
-        place-items: center;
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: clamp(1.8rem, 4vw, 2.5rem);
-      }
-
-      .tag {
-        color: var(--muted);
-        font-size: 0.9rem;
-        margin-top: 2px;
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(120px, 1fr));
-        gap: 16px;
-        margin: 24px 0;
-      }
-
-      .stat {
-        background: rgba(31, 41, 55, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.12);
-        border-radius: 18px;
-        padding: 18px 16px;
-      }
-
-      .label {
-        display: block;
-        color: var(--muted);
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-
-      .value {
-        display: block;
-        margin-top: 8px;
-        font-size: clamp(1.5rem, 2vw, 2rem);
-        font-weight: 700;
-      }
-
-      .card {
-        background: rgba(17, 24, 39, 0.86);
-        border: 1px solid rgba(148, 163, 184, 0.12);
-        border-radius: 18px;
-        padding: 18px;
-      }
-
-      .task-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .task-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(31, 41, 55, 0.8);
-        border-radius: 12px;
-        padding: 12px 14px;
-      }
-
-      .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 999px;
-        background: var(--primary-2);
-        box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
-      }
-
-      .task-text {
-        color: var(--text);
-      }
-
-      .actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-      }
-
-      button {
-        border: 0;
-        border-radius: 12px;
-        padding: 12px 18px;
-        font-weight: 700;
-        cursor: pointer;
-        color: white;
-        background: linear-gradient(135deg, var(--primary), #3b82f6);
-      }
-
-      button.secondary {
-        background: linear-gradient(135deg, #1f2937, #374151);
-      }
-
-      @media (max-width: 520px) {
-        .top {
-          flex-direction: column;
-          align-items: flex-start;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overscroll-behavior-y: none;
+            min-height: 100dvh;
         }
-
-        .stats {
-          grid-template-columns: 1fr;
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media screen and (max-width: 768px) {
+            input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="tel"], textarea {
+                font-size: 16px !important;
+            }
         }
-      }
     </style>
-  </head>
-  <body>
-    <main class="app">
-      <header class="top">
-        <div class="brand">
-          <div class="logo">T</div>
-          <div>
-            <h1>ThinkNow</h1>
-            <div class="tag">Organize sua rotina e foco.</div>
-          </div>
-        </div>
-      </header>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
 
-      <section class="stats" aria-label="Estatísticas do app">
-        <div class="stat">
-          <span class="label">Hoje</span>
-          <span class="value">04</span>
-        </div>
-        <div class="stat">
-          <span class="label">Meta</span>
-          <span class="value">80%</span>
-        </div>
-        <div class="stat">
-          <span class="label">Foco</span>
-          <span class="value">2h</span>
-        </div>
-      </section>
+    <div id="authContainer" class="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl my-auto">
+            <div class="text-center mb-6">
+                <div class="inline-flex bg-gradient-to-tr from-emerald-500 to-teal-400 p-3 rounded-2xl text-white shadow-md shadow-emerald-500/20 mb-2">
+                    <i class="fa-solid fa-bolt text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-wider bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">THINKNOW</h1>
+                <p id="authSubtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Faça login para acessar seu mural</p>
+            </div>
 
-      <section class="card" aria-label="Lista de tarefas">
-        <ul class="task-list">
-          <li class="task-item"><span class="dot"></span><span class="task-text">Revisar proposta do cliente</span></li>
-          <li class="task-item"><span class="dot"></span><span class="task-text">Planejar tarefas da semana</span></li>
-          <li class="task-item"><span class="dot"></span><span class="task-text">Concluir sprint de produtividade</span></li>
-        </ul>
-      </section>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">E-mail</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3.5 text-slate-400 text-sm"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" id="loginEmail" required placeholder="seu@email.com" 
+                            class="w-full pl-10 pr-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
 
-      <div class="actions">
-        <button type="button">Adicionar tarefa</button>
-        <button type="button" class="secondary">Ver resumo</button>
-      </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Senha</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3.5 text-slate-400 text-sm"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" 
+                            class="w-full pl-10 pr-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition text-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Entrar</span>
+                </button>
+
+                <div class="text-center pt-2">
+                    <button type="button" onclick="switchAuthMode('register')" class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                        Não tem uma conta? Crie agora
+                    </button>
+                </div>
+            </form>
+
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div class="flex flex-col items-center mb-4">
+                    <div class="relative w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 overflow-hidden flex items-center justify-center group cursor-pointer">
+                        <img id="registerAvatarPreview" src="" alt="" class="w-full h-full object-cover hidden">
+                        <div id="registerAvatarPlaceholder" class="flex flex-col items-center text-slate-400">
+                            <i class="fa-solid fa-camera text-xl mb-1"></i>
+                            <span class="text-[10px]">Foto</span>
+                        </div>
+                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleRegisterAvatar(event)">
+                    </div>
+                    <span class="text-[11px] text-slate-400 mt-1">Toque para adicionar foto de perfil</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nome Completo</label>
+                    <input type="text" id="regName" required placeholder="Seu Nome" 
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nascimento</label>
+                        <input type="date" id="regDob" required 
+                            class="w-full px-3 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">E-mail</label>
+                        <input type="email" id="regEmail" required placeholder="seu@email.com" 
+                            class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Senha</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" 
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition text-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Cadastrar e Entrar</span>
+                </button>
+
+                <div class="text-center pt-2">
+                    <button type="button" onclick="switchAuthMode('login')" class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                        Já tem uma conta? Faça login
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2 rounded-xl text-white shadow-md shadow-emerald-500/20">
+                    <i class="fa-solid fa-bolt text-lg"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-wider bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">THINKNOW</h1>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div id="liveClock" class="text-xs font-semibold px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    --:--:--
+                </div>
+                <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 shadow-sm">
+        <div class="max-w-3xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-sm">
+            <div class="flex items-center space-x-2.5 w-full sm:w-auto">
+                <div id="headerAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center font-bold text-emerald-600 dark:text-emerald-400 text-xs border border-emerald-200 dark:border-emerald-800 flex-shrink-0">
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="text-slate-400 text-xs">Olá,</span>
+                    <input type="text" id="usernameInput" placeholder="Seu Nome" 
+                        class="bg-transparent font-bold text-sm focus:outline-none focus:border-b focus:border-emerald-500 max-w-[140px] truncate"
+                        onchange="saveUsername(this.value)">
+                </div>
+            </div>
+            <div class="flex items-center flex-wrap gap-1.5 w-full sm:w-auto justify-end">
+                <button onclick="openProfileModal()" class="text-xs px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-id-card text-emerald-500"></i> 
+                    <span>Perfil</span>
+                </button>
+                <button onclick="openFriendsModal()" class="text-xs px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-semibold rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-user-group"></i> 
+                    <span>Amigos</span>
+                </button>
+                <button onclick="openInviteModal()" class="text-xs px-2.5 py-1.5 bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 font-semibold rounded-lg border border-teal-200 dark:border-teal-800 hover:bg-teal-100 transition flex items-center space-x-1">
+                    <i class="fa-brands fa-whatsapp"></i> 
+                    <span>Convidar</span>
+                </button>
+                <button onclick="handleLogout()" class="text-xs px-2.5 py-1.5 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-semibold rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 transition flex items-center space-x-1" title="Sair">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <main class="flex-1 max-w-3xl w-full mx-auto p-4 pb-28 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm mb-6">
+            <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center">
+                <i class="fa-solid fa-camera-retro mr-2 text-emerald-500"></i> Criar Novo Momento THINKNOW
+            </h2>
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <label class="flex items-center justify-center space-x-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl cursor-pointer shadow-md shadow-emerald-600/20 transition text-sm">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Tirar Foto</span>
+                    <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelection(event)">
+                </label>
+                
+                <label class="flex items-center justify-center space-x-2 py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 transition text-sm">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Fototeca</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
+                </label>
+            </div>
+
+            <div id="previewContainer" class="hidden space-y-3 border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div class="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 max-h-64 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                    <img id="imagePreview" src="" alt="Preview" class="object-cover max-h-64 w-full">
+                    <button onclick="clearImagePreview()" class="absolute top-2 right-2 bg-black/60 hover:bg-black text-white w-8 h-8 rounded-full flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="postSummary" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Resumo (Até 60 caracteres)</label>
+                        <span id="charCount" class="text-xs text-slate-400 font-mono">0/60</span>
+                    </div>
+                    <input type="text" id="postSummary" maxlength="60" placeholder="Escreva um breve resumo..." 
+                        oninput="updateCharCount(this)"
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <button onclick="publishPost()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition text-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Enviar para o Mural</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center">
+                    <i class="fa-solid fa-stream mr-2 text-emerald-500"></i> Mural THINKNOW
+                </h3>
+                <span id="postCount" class="text-xs text-slate-400 font-medium">0 posts</span>
+            </div>
+
+            <div id="postsFeed" class="space-y-4"></div>
+
+            <div id="emptyFeed" class="text-center py-12 px-4 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
+                <div class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400">
+                    <i class="fa-solid fa-camera text-xl"></i>
+                </div>
+                <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Nenhum momento publicado ainda</h4>
+                <p class="text-xs text-slate-400 mt-1">Tire ou anexe uma foto acima para começar seu diário visual.</p>
+            </div>
+        </div>
     </main>
 
+    <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base flex items-center">
+                    <i class="fa-solid fa-id-card text-emerald-500 mr-2"></i> Dados do Perfil
+                </h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex flex-col items-center">
+                    <div class="relative w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-emerald-500 shadow-md group cursor-pointer">
+                        <img id="modalAvatarImg" src="" alt="Avatar" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            <i class="fa-solid fa-camera text-white text-lg"></i>
+                        </div>
+                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateProfileAvatar(event)">
+                    </div>
+                    <span class="text-xs text-slate-400 mt-1">Toque para alterar a foto</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nome Completo</label>
+                    <input type="text" id="profileName" 
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">E-mail</label>
+                    <input type="email" id="profileEmail" disabled 
+                        class="w-full px-3.5 py-3 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-500 cursor-not-allowed">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Data de Nascimento</label>
+                    <input type="date" id="profileDob" 
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+
+            <div class="flex space-x-3 mt-6">
+                <button onclick="closeProfileModal()" class="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-xl text-sm hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="saveProfileData()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow-md transition">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="friendsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base flex items-center">
+                    <i class="fa-solid fa-user-group text-emerald-500 mr-2"></i> Procurar Amigos
+                </h3>
+                <button onclick="closeFriendsModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Conecte-se com outros usuários locais do THINKNOW.</p>
+            
+            <div class="space-y-3 max-h-60 overflow-y-auto mb-4">
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center font-bold text-sm">MC</div>
+                        <div>
+                            <div class="text-sm font-semibold">Mariana Costa</div>
+                            <div class="text-xs text-slate-400">Online</div>
+                        </div>
+                    </div>
+                    <button onclick="toggleFriendStatus(this)" class="text-xs px-3 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition">Conectar</button>
+                </div>
+            </div>
+            <button onclick="closeFriendsModal()" class="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 font-semibold rounded-xl text-sm">Fechar</button>
+        </div>
+    </div>
+
+    <div id="inviteModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base flex items-center">
+                    <i class="fa-brands fa-whatsapp text-emerald-500 mr-2 text-lg"></i> Convidar via WhatsApp
+                </h3>
+                <button onclick="closeInviteModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4 mb-5">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Número do WhatsApp (Ex: 5511999999999)</label>
+                    <input type="tel" id="whatsappNumber" placeholder="5511988887777" 
+                        class="w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Mensagem</label>
+                    <textarea id="whatsappMessage" rows="3" 
+                        class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none resize-none">Olá! Venha conhecer o THINKNOW, meu aplicativo diário visual offline favorito.</textarea>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeInviteModal()" class="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 font-semibold rounded-xl text-sm">Cancelar</button>
+                <button onclick="sendWhatsAppInvite()" class="flex-1 py-3 bg-emerald-600 text-white font-semibold rounded-xl text-sm shadow-md">Enviar Convite</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-5 sm:max-w-sm z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-800 flex items-center space-x-3 text-sm">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage">Ação realizada com sucesso!</span>
+    </div>
+
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(() => {
-            console.warn('Service worker não disponível neste ambiente.');
-          });
-        });
-      }
+        let currentImageBase64 = null;
+        let regAvatarBase64 = null;
+        let posts = [];
+
+        window.onload = function() {
+            initClock();
+            checkSession();
+            checkSystemTheme();
+        };
+
+        function checkSession() {
+            const currentUser = localStorage.getItem('thinknow_current_user');
+            if (currentUser) {
+                document.getElementById('authContainer').classList.add('hidden');
+                loadUserData();
+                loadPosts();
+            } else {
+                document.getElementById('authContainer').classList.remove('hidden');
+            }
+        }
+
+        function switchAuthMode(mode) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const subtitle = document.getElementById('authSubtitle');
+
+            if (mode === 'register') {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                subtitle.innerText = 'Crie sua conta para começar';
+            } else {
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                subtitle.innerText = 'Faça login para acessar seu mural';
+            }
+        }
+
+        function handleRegisterAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                regAvatarBase64 = e.target.result;
+                const preview = document.getElementById('registerAvatarPreview');
+                const placeholder = document.getElementById('registerAvatarPlaceholder');
+                preview.src = regAvatarBase64;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const dob = document.getElementById('regDob').value;
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+
+            const userData = {
+                name: name,
+                email: email,
+                dob: dob,
+                password: password,
+                avatar: regAvatarBase64 || ''
+            };
+
+            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
+            localStorage.setItem('thinknow_current_user', email);
+
+            showToast('Conta criada com sucesso!');
+            setTimeout(() => { checkSession(); }, 500);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            const savedUserJson = localStorage.getItem('thinknow_user_' + email);
+            if (!savedUserJson) {
+                showToast('E-mail não encontrado. Crie uma conta.', 'error');
+                return;
+            }
+
+            const userData = JSON.parse(savedUserJson);
+            if (userData.password !== password) {
+                showToast('Senha incorreta.', 'error');
+                return;
+            }
+
+            localStorage.setItem('thinknow_current_user', email);
+            showToast('Login realizado com sucesso!');
+            setTimeout(() => { checkSession(); }, 500);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('thinknow_current_user');
+            showToast('Você saiu da conta.');
+            setTimeout(() => { window.location.reload(); }, 500);
+        }
+
+        function loadUserData() {
+            const email = localStorage.getItem('thinknow_current_user');
+            if (!email) return;
+            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+
+            document.getElementById('usernameInput').value = userData.name || 'Usuário';
+            
+            const headerAvatar = document.getElementById('headerAvatarContainer');
+            if (userData.avatar) {
+                headerAvatar.innerHTML = `<img src="${userData.avatar}" class="w-full h-full object-cover">`;
+            } else {
+                headerAvatar.innerText = (userData.name || 'U').substring(0, 2).toUpperCase();
+            }
+        }
+
+        function openProfileModal() {
+            const email = localStorage.getItem('thinknow_current_user');
+            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+
+            document.getElementById('profileName').value = userData.name || '';
+            document.getElementById('profileEmail').value = userData.email || '';
+            document.getElementById('profileDob').value = userData.dob || '';
+            document.getElementById('modalAvatarImg').src = userData.avatar || 'https://via.placeholder.com/150';
+
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+
+        function updateProfileAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('modalAvatarImg').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveProfileData() {
+            const email = localStorage.getItem('thinknow_current_user');
+            let userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+
+            userData.name = document.getElementById('profileName').value.trim();
+            userData.dob = document.getElementById('profileDob').value;
+            userData.avatar = document.getElementById('modalAvatarImg').src;
+
+            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
+            closeProfileModal();
+            loadUserData();
+            showToast('Perfil atualizado!');
+        }
+
+        function saveUsername(name) {
+            const email = localStorage.getItem('thinknow_current_user');
+            let userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+            userData.name = name.trim();
+            localStorage.setItem('thinknow_user_' + email, JSON.stringify(userData));
+            showToast('Nome atualizado!');
+        }
+
+        function initClock() {
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('thinknow_theme', 'light');
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('thinknow_theme', 'dark');
+                icon.className = 'fa-solid fa-sun';
+            }
+        }
+
+        function checkSystemTheme() {
+            const savedTheme = localStorage.getItem('thinknow_theme');
+            const icon = document.getElementById('themeIcon');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                document.documentElement.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function handleImageSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result;
+                document.getElementById('imagePreview').src = currentImageBase64;
+                document.getElementById('previewContainer').classList.remove('hidden');
+                document.getElementById('postSummary').value = '';
+                document.getElementById('charCount').innerText = '0/60';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImagePreview() {
+            currentImageBase64 = null;
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('previewContainer').classList.add('hidden');
+        }
+
+        function updateCharCount(input) {
+            document.getElementById('charCount').innerText = `${input.value.length}/60`;
+        }
+
+        function publishPost() {
+            if (!currentImageBase64) {
+                showToast('Selecione uma foto primeiro.', 'error');
+                return;
+            }
+            const email = localStorage.getItem('thinknow_current_user');
+            const userData = JSON.parse(localStorage.getItem('thinknow_user_' + email) || '{}');
+            const username = userData.name || 'Usuário';
+            const summary = document.getElementById('postSummary').value.trim();
+            const now = new Date();
+            const timeString = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                username: username,
+                image: currentImageBase64,
+                summary: summary || 'Momento THINKNOW.',
+                timestamp: timeString
+            };
+
+            posts.unshift(newPost);
+            localStorage.setItem('thinknow_posts_' + email, JSON.stringify(posts));
+
+            clearImagePreview();
+            renderPosts();
+            showToast('Momento postado com sucesso!');
+        }
+
+        function loadPosts() {
+            const email = localStorage.getItem('thinknow_current_user');
+            const savedPosts = localStorage.getItem('thinknow_posts_' + email);
+            if (savedPosts) {
+                try { posts = JSON.parse(savedPosts); } catch (e) { posts = []; }
+            }
+            renderPosts();
+        }
+
+        function deletePost(postId) {
+            const email = localStorage.getItem('thinknow_current_user');
+            posts = posts.filter(p => p.id !== postId);
+            localStorage.setItem('thinknow_posts_' + email, JSON.stringify(posts));
+            renderPosts();
+            showToast('Post removido.');
+        }
+
+        function renderPosts() {
+            const feedContainer = document.getElementById('postsFeed');
+            const emptyContainer = document.getElementById('emptyFeed');
+            const postCountBadge = document.getElementById('postCount');
+
+            postCountBadge.innerText = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
+            if (posts.length === 0) {
+                feedContainer.innerHTML = '';
+                emptyContainer.classList.remove('hidden');
+                return;
+            }
+
+            emptyContainer.classList.add('hidden');
+            feedContainer.innerHTML = '';
+
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm';
+                card.innerHTML = `
+                    <div class="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
+                                ${escapeHtml(post.username.substring(0, 2).toUpperCase())}
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-slate-800 dark:text-slate-200">${escapeHtml(post.username)}</h5>
+                                <span class="text-[10px] text-slate-400">${escapeHtml(post.timestamp)}</span>
+                            </div>
+                        </div>
+                        <button onclick="deletePost('${post.id}')" class="text-slate-400 hover:text-red-500 transition p-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="bg-slate-950 flex items-center justify-center max-h-96 overflow-hidden">
+                        <img src="${post.image}" class="w-full object-contain max-h-96">
+                    </div>
+                    <div class="p-3.5 bg-slate-50/50 dark:bg-slate-900/50">
+                        <p class="text-xs md:text-sm text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(post.summary)}</p>
+                    </div>
+                `;
+                feedContainer.appendChild(card);
+            });
+        }
+
+        function openFriendsModal() { document.getElementById('friendsModal').classList.remove('hidden'); }
+        function closeFriendsModal() { document.getElementById('friendsModal').classList.add('hidden'); }
+        function toggleFriendStatus(btn) {
+            btn.innerText = btn.innerText === 'Conectar' ? 'Adicionado' : 'Conectar';
+            btn.className = btn.innerText === 'Adicionado' 
+                ? 'text-xs px-3 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition'
+                : 'text-xs px-3 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition';
+            showToast('Status atualizado!');
+        }
+
+        function openInviteModal() { document.getElementById('inviteModal').classList.remove('hidden'); }
+        function closeInviteModal() { document.getElementById('inviteModal').classList.add('hidden'); }
+        function sendWhatsAppInvite() {
+            const rawNumber = document.getElementById('whatsappNumber').value.trim();
+            const message = document.getElementById('whatsappMessage').value.trim();
+            if (!rawNumber) { showToast('Insira o número do WhatsApp.', 'error'); return; }
+            window.open(`https://wa.me/${rawNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+            closeInviteModal();
+            showToast('Redirecionando...');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            toastMsg.innerText = message;
+            toastIcon.className = type === 'error' ? 'fa-solid fa-circle-exclamation text-red-400' : 'fa-solid fa-circle-check text-emerald-400';
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
     </script>
-  </body>
+</body>
 </html>
